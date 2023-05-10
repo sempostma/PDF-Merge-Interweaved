@@ -2,7 +2,7 @@
 
 Merge even and odd documents. Interweaving also works with 3 or more documents. Combining PDF's one after another is also supported.
 
-![images/preview.jpg] 
+![Preview](images/preview.jpg) 
 
 ## How to download?
 
