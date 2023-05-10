@@ -6,4 +6,10 @@ Merge even and odd documents. Interweaving also works with 3 or more documents. 
 
 ## How to download?
 
-Download the lastest release under "Releases".
+- Go the the lastest release under "Releases". 
+- Download the PDF_Interweaved_Merge.zip file.
+- When you first run the program, you may be prompted to install .NET 6 if you haven't installed it already.
+
+## License
+
+MIT
