@@ -1,4 +1,6 @@
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 using UglyToad.PdfPig;
 using UglyToad.PdfPig.Content;
 using UglyToad.PdfPig.Writer;
@@ -19,8 +21,38 @@ namespace MergeEvenOddPDF
 
         private void Credits_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            System.Diagnostics.Process.Start("https://github.com/sempostma");
+            OpenUrl("https://github.com/sempostma");
         }
+
+        private void OpenUrl(string url)
+        {
+            try
+            {
+                Process.Start(url);
+            }
+            catch
+            {
+                // because of this: https://github.com/dotnet/corefx/issues/10361
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    url = url.Replace("&", "^&");
+                    Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    Process.Start("xdg-open", url);
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                {
+                    Process.Start("open", url);
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
+
         protected void OnListChanged(object sender, ListChangedEventArgs args)
         {
             Up.Enabled = filesList.Count > 1;
@@ -35,6 +67,7 @@ namespace MergeEvenOddPDF
             {
                 var o = new OpenFileDialog();
                 o.Multiselect = true;
+                o.Filter = "PDF files (*.pdf)|*.pdf|All files (*.*)|*.*";
                 if (o.ShowDialog() == DialogResult.OK)
                 {
                     o.FileNames.ToList().ForEach(filePath =>
@@ -81,16 +114,18 @@ namespace MergeEvenOddPDF
             var file = filesList[index];
             filesList.RemoveAt(index);
             filesList.Insert(index - 1, file);
+            filesListBox.SetSelected(index - 1, true);
             filesListBox.Refresh();
         }
 
         private void Down_Click(object sender, EventArgs e)
         {
             int index = filesListBox.SelectedIndex;
-            if (index == filesList.Count + 1 || index == -1) return;
+            if (index + 1 == filesList.Count || index == -1) return;
             var file = filesList[index];
             filesList.RemoveAt(index);
             filesList.Insert(index + 1, file);
+            filesListBox.SetSelected(index + 1, true);
             filesListBox.Refresh();
         }
 
@@ -99,6 +134,7 @@ namespace MergeEvenOddPDF
             int index = filesListBox.SelectedIndex;
             if (index == -1) return;
             filesList.RemoveAt(index);
+            filesListBox.ClearSelected();
             filesListBox.Refresh();
         }
 
